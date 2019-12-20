@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Items</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <script src="https://unpkg.com/vue"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+</head>
+<body>
+<div id="app" style="display: flex;">
+  <div class="container">
+    <p>Code:</p>
+    <input id="code" v-model="currentItem.code">
+    <p>Name:</p>
+    <input id="name" v-model="currentItem.name">
+    <p>Unit:</p>
+    <input id="unit" v-model="currentItem.unit">
+    <p>Price:</p>
+    <input id="price" v-model="currentItem.price">
+    <button id="submit" v-on:click="addItems">提交</button>
+  </div>
+  <div class="container">
+    <table class="table">
+      <thead>
+      <tr>
+        <td>code</td>
+        <td>name</td>
+        <td>unit</td>
+        <td>price</td>
+      </tr>
+      </thead>
+      <tbody id="tby">
+      <tr v-for="(item, index) in items" :key="item.code">
+        <td>{{item.code}}</td>
+        <td>{{item.name}}</td>
+        <td>{{item.unit}}</td>
+        <td>{{item.price}}</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  var app = new Vue({
+    el: '#app',
+    data: {
+      currentItem: {},
+      items: []
+    },
+    mounted: function () {
+      this.$nextTick(this.getItems())
+    },
+    methods: {
+      getItems: function () {
+        axios
+          .get('/items')
+          .then(response => {
+              this.items = response.data;
+            }
+          ).catch(function (error) {
+            console.log(error);
+        });
+      },
+      addItems: function () {
+        axios
+          .post('/items', this.currentItem)
+          .then(response => {
+              this.getItems();
+              this.currentItem = {};
+            }
+          ).catch(function (error) {
+          console.log(error);
+        });
+      }
+    }
+  })
+</script>
+</body>
+</html>
