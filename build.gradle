@@ -47,3 +47,24 @@ task e2e(type: JavaExec) {
     classpath = sourceSets.test.runtimeClasspath
     main = "org.builtinquality.pos.ItemsExternalE2ETest"
 }
+
+task installGitPreCommitHooks(type: Copy) {
+    from new File(rootProject.rootDir, 'pre-commit')
+    into {
+        new File(rootProject.rootDir, '.git/hooks')
+    }
+    fileMode 0755
+}
+
+task installGitPrePushHooks(type: Copy) {
+    from new File(rootProject.rootDir, 'pre-push')
+    into {
+        new File(rootProject.rootDir, '.git/hooks')
+    }
+    fileMode 0755
+}
+
+build {
+    dependsOn installGitPreCommitHooks
+    dependsOn installGitPrePushHooks
+}
