@@ -1,40 +1,51 @@
-package org.builtinquality.pos;
+package org.builtinquality.pos.e2e;
 
+import io.github.bonigarcia.wdm.WebDriverManager;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 
-import java.net.URL;
 import java.util.List;
 
 import static java.lang.Thread.sleep;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class ItemsExternalE2ETest {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class ItemsInternalE2ETest {
 
-    private static WebDriver driver;
+    private WebDriver driver;
 
-    public static void main(String[] args) throws Exception {
-        setUp();
-        shouldSaveItems();
-        tearDown();
+    @LocalServerPort
+    private int port;
+
+    @BeforeAll
+    public static void setUpClass() throws Exception {
+        WebDriverManager.chromedriver().version("78").setup();
     }
 
-    static void setUp() throws Exception {
-        driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), DesiredCapabilities.chrome());
+    @BeforeEach
+    public void setUp() throws Exception {
+        driver = new ChromeDriver();
     }
 
-    static void tearDown() {
+    @AfterEach
+    public void tearDown() {
         if (driver != null) {
             driver.quit();
         }
     }
 
-    static void shouldSaveItems() throws InterruptedException {
-        driver.navigate().to("http://localhost:8080");
+    @Test
+    public void should_save_items() throws InterruptedException {
+        driver.navigate().to(String.format("http://localhost:%s", port));
 
         WebElement body = driver.findElement(By.tagName("body"));
         body.findElement(By.id("code")).sendKeys("ITEM001");

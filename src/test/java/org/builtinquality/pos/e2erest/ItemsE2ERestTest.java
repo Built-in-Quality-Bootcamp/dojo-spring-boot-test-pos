@@ -1,4 +1,4 @@
-package org.builtinquality.pos;
+package org.builtinquality.pos.e2erest;
 
 import io.restassured.RestAssured;
 import org.builtinquality.pos.entity.ItemEntity;

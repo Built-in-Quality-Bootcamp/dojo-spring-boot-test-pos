@@ -1,4 +1,4 @@
-package org.builtinquality.pos;
+package org.builtinquality.pos.apitest;
 
 import org.builtinquality.pos.controllers.ItemController;
 import org.builtinquality.pos.entity.ItemEntity;
@@ -9,6 +9,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.Optional;
 
 import static java.util.Arrays.asList;
 import static org.mockito.Mockito.when;
@@ -41,12 +43,21 @@ public class ItemsAPITest {
 
     @Test
     public void should_get_correct_item_when_query_by_code() throws Exception {
-        when(itemsRepository.getOne("ITEM001"))
-                .thenReturn(new ItemEntity("ITEM001", "可口可乐", "听", 2d));
+        when(itemsRepository.findById("ITEM001"))
+                .thenReturn(Optional.of(new ItemEntity("ITEM001", "可口可乐", "听", 2d)));
 
         mockMvc.perform(get("/items/ITEM001"))
                 .andExpect(content().json("{\"code\": \"ITEM001\", \"name\": \"可口可乐\", \"unit\": \"听\", \"price\": 2}"))
                 .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
+    public void should_get_error_when_query_item_not_exits() throws Exception {
+        when(itemsRepository.findById("ITEM001"))
+                .thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/items/ITEM001"))
+                .andExpect(status().isNotFound());
     }
 
     @Test
